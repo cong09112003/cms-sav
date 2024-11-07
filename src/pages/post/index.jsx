@@ -1,0 +1,716 @@
+import React, { useEffect, useState } from "react";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
+import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { FcOk } from "react-icons/fc";
+import { MdNotInterested } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { AiFillDelete } from "react-icons/ai";
+import { MdPostAdd } from "react-icons/md";
+import OverlayEditPost from "./overlayEdit";
+import OverlayDeletePost from "./overlayDelete";
+import OverlayAddPost from "./overlayAdd";
+const Post = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
+  const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
+  const [isOpenAdd, setIsOpenAdd] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+
+  const statusPost = ["Active", "Inactive", "Deleted", "Pending", "Locked"];
+  const statusPostColors = {
+    Active: "#23ca02",
+    Inactive: "#ec8a0e",
+    Deleted: "#ff0032",
+    Pending: "10d89e",
+    Locked: "#ff0000",
+  };
+
+  const roomTypePost = ["Single", "Shared", "Apartment", "Dormitory", "Double"];
+  const roomTypePostColors = {
+    Single: "#23ca02",
+    Shared: "#ec8a0e",
+    Apartment: "#ff0032",
+    Dormitory: "#10d89e",
+    Double: "#10d8b1",
+  };
+
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  const toggleOverlayEdit = (post) => {
+    setSelectedPost(post);
+    setIsOpenEdit(!isOpenEdit);
+  };
+  const toggleOverlayDelete = (post) => {
+    setSelectedPost(post);
+    setIsOpenDelete(!isOpenDelete);
+  };
+  const toggleOverlayAdd = () => {
+    setIsOpenAdd(!isOpenAdd);
+  };
+  const getPosts = async () => {
+    const token = localStorage.getItem("sav-token");
+
+    if (token) {
+      try {
+        const response = await axios.get(
+          "https://be-android-project.onrender.com/api/post/getAll",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setPosts(response.data);
+        } else {
+          alert("Cannot get posts");
+        }
+      } catch (error) {
+        console.error("Token validation failed:", error);
+        localStorage.removeItem("sav-token");
+        navigate("/login");
+      }
+    } else {
+      navigate("/login");
+    }
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, [navigate]);
+
+  const columns = [
+    { field: "_id", headerName: "Post Id", width: 170 },
+    {
+      field: "title",
+      headerName: "Title",
+      width: 500,
+      cellClassName: "name-column--cell",
+    },
+    {
+      field: "price",
+      headerName: "Price per Month",
+      type: "number",
+      width: 200,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.price}</span>
+        </Box>
+      ),
+    },
+    {
+      field: "location.geoLocation.coordinates",
+      headerName: "Coordinates",
+      cellClassName: "name-column--cell",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.location.geoLocation.coordinates &&
+            params.row.location.geoLocation.coordinates.length > 0
+              ? params.row.location.geoLocation.coordinates.join(", ")
+              : "#"}
+          </span>
+        </Box>
+      ),
+    },
+
+    {
+      field: "location.address",
+      headerName: "Address",
+      width: 600,
+      valueGetter: (params) =>
+        params.row.location ? params.row.location.address : "No Address",
+    },
+    {
+      field: "location.city",
+      headerName: "City",
+      width: 150,
+      headerAlign: "left",
+      cellClassName: "name-column--cell",
+      valueGetter: (params) =>
+        params.row.location ? params.row.location.city : "No City",
+    },
+    {
+      field: "location.district",
+      headerName: "District",
+      width: 150,
+      valueGetter: (params) =>
+        params.row.location ? params.row.location.district : "No District",
+    },
+    {
+      field: "location.ward",
+      headerName: "Ward",
+      width: 150,
+      cellClassName: "name-column--cell",
+      valueGetter: (params) =>
+        params.row.location ? params.row.location.ward : "No Ward",
+    },
+    {
+      field: "averageRating",
+      headerName: "Average Rating",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.averageRating ? params.row.averageRating : 0}</span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.averageRating,
+    },
+    {
+      field: "views",
+      headerName: "Views",
+      width: 150,
+      headerAlign: "center",
+      type: "number",
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.views ? params.row.views : 0}</span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.views,
+    },
+    {
+      field: "landlord._id",
+      headerName: "Landlord Id",
+      width: 200,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.landlord ? params.row.landlord._id : "#"}</span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.landlord ? params.row.landlord._id : "#",
+    },
+    {
+      field: "landlord.username",
+      headerName: "Landlord username",
+      width: 200,
+      cellClassName: "name-column--cell",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.landlord ? params.row.landlord.username : "#"}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.landlord ? params.row.landlord.username : "#",
+    },
+    {
+      field: "landlord.email",
+      headerName: "Landlord email",
+      width: 200,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.landlord ? params.row.landlord.email : "#"}</span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.landlord ? params.row.landlord.email : "#",
+    },
+    {
+      field: "landlord.phone",
+      headerName: "Landlord phone",
+      width: 200,
+      cellClassName: "name-column--cell",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.landlord ? params.row.landlord.phone : "#"}</span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.landlord ? params.row.landlord.phone : "#",
+    },
+    {
+      field: "landlord.address",
+      headerName: "Landlord address",
+      width: 200,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.landlord ? params.row.landlord.address : "#"}</span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.landlord ? params.row.landlord.address : "#",
+    },
+    {
+      field: "roomType",
+      headerName: "Room Type",
+      width: 120,
+      headerAlign: "center",
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span
+            style={{
+              color: roomTypePostColors[params.row.roomType] || "black",
+              fontWeight: "bold",
+            }}
+          >
+            {params.row.roomType || "#"}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) =>
+        params.row.roomType ? params.row.roomType : "#",
+    },
+    {
+      field: "size",
+      headerName: "Size (sqm)",
+      type: "number",
+      width: 100,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>{params.row.size}</span>
+        </Box>
+      ),
+    },
+    {
+      field: "availability",
+      headerName: "Availability",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.availability ? <FcOk /> : <MdNotInterested />}
+          </IconButton>
+        </Box>
+      ),
+    },
+    {
+      field: "amenities.hasWifi",
+      headerName: "Wifi",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.amenities.hasWifi ? <FcOk /> : <MdNotInterested />}
+          </IconButton>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.amenities.hasWifi,
+    },
+    {
+      field: "amenities.hasParking",
+      headerName: "Parking",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.amenities.hasParking ? <FcOk /> : <MdNotInterested />}
+          </IconButton>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.amenities.hasParking,
+    },
+    {
+      field: "amenities.hasAirConditioner",
+      headerName: "Air Conditioner",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.amenities.hasAirConditioner ? (
+              <FcOk />
+            ) : (
+              <MdNotInterested />
+            )}
+          </IconButton>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.amenities.hasAirConditioner,
+    },
+    {
+      field: "amenities.hasKitchen",
+      headerName: "Kitchen",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.amenities.hasKitchen ? <FcOk /> : <MdNotInterested />}
+          </IconButton>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.amenities.hasKitchen,
+    },
+    {
+      field: "amenities.hasElevator",
+      headerName: "Elevator",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton>
+            {params.row.amenities.hasElevator ? <FcOk /> : <MdNotInterested />}
+          </IconButton>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.amenities.hasElevator,
+    },
+    {
+      field: "additionalCosts.electricity",
+      headerName: "Electricity Cost",
+      width: 150,
+      cellClassName: "name-column--cell",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.additionalCosts
+              ? params.row.additionalCosts.electricity
+              : 0}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.additionalCosts.electricity,
+    },
+    {
+      field: "additionalCosts.water",
+      headerName: "Water Cost",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.additionalCosts ? params.row.additionalCosts.water : 0}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.additionalCosts.water,
+    },
+    {
+      field: "additionalCosts.internet",
+      headerName: "Internet Cost",
+      width: 150,
+      cellClassName: "name-column--cell",
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.additionalCosts
+              ? params.row.additionalCosts.internet
+              : 0}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.additionalCosts.internet,
+    },
+    {
+      field: "additionalCosts.cleaningService",
+      headerName: "Cleaning Service Cost",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.additionalCosts
+              ? params.row.additionalCosts.cleaningService
+              : 0}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.additionalCosts.cleaningService,
+    },
+    {
+      field: "additionalCosts.security",
+      headerName: "Security Cost",
+      width: 150,
+      headerAlign: "center",
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span>
+            {params.row.additionalCosts
+              ? params.row.additionalCosts.security
+              : 0}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.additionalCosts.security,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <span
+            style={{
+              color: statusPostColors[params.row.status] || "black", // màu mặc định nếu không khớp
+              fontWeight: "bold",
+            }}
+          >
+            {params.row.status}
+          </span>
+        </Box>
+      ),
+      valueGetter: (params) => params.row.status,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <IconButton
+            onClick={() => {
+              toggleOverlayEdit(params.row);
+            }}
+          >
+            <FaEdit />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              toggleOverlayDelete(params.row);
+            }}
+          >
+            <AiFillDelete color="red" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+  return (
+    <Box m="20px">
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Header title="POST" subtitle="Welcome to posts" />
+        <IconButton
+          onClick={() => {
+            toggleOverlayAdd();
+          }}
+        >
+          <MdPostAdd size="30" />
+        </IconButton>
+      </Box>
+      <Box
+        m="8px 0 0 0"
+        width="100%"
+        height="80vh"
+        sx={{
+          "& .MuiDataGrid-root": { border: "none" },
+          "& .MuiDataGrid-cell": { borderBottom: "none" },
+          "& .name-column--cell": { color: colors.greenAccent[300] },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+          },
+          "& .MuiCheckbox-root": {
+            color: `${colors.greenAccent[200]} !important`,
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: `${colors.grey[100]} !important`,
+          },
+        }}
+      >
+        <DataGrid
+          rows={posts}
+          columns={columns}
+          components={{ Toolbar: GridToolbar }}
+          getRowId={(row) => row._id}
+        />
+      </Box>
+      {isOpenEdit && (
+        <OverlayEditPost
+          isOpenEdit={isOpenEdit}
+          onClose={toggleOverlayEdit}
+          selectedPost={selectedPost}
+          refreshPosts={getPosts}
+        ></OverlayEditPost>
+      )}
+      {isOpenDelete && (
+        <OverlayDeletePost
+          isOpenEdit={isOpenDelete}
+          onClose={toggleOverlayDelete}
+          selectedPost={selectedPost}
+          refreshPosts={getPosts}
+        ></OverlayDeletePost>
+      )}
+      {isOpenAdd && (
+        <OverlayAddPost
+          isOpenEdit={isOpenAdd}
+          onClose={toggleOverlayAdd}
+          refreshPosts={getPosts}
+        ></OverlayAddPost>
+      )}
+    </Box>
+  );
+};
+
+export default Post;

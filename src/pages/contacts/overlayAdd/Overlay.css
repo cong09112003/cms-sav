@@ -1,0 +1,87 @@
+.overlay__background {
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  z-index: 9;
+}
+
+.overlay__container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 30px;
+  width: 400px;
+  max-width: 90%;
+  z-index: 10;
+}
+
+.overlay__controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.overlay__close:after {
+  display: inline-block;
+  content: "\00d7";
+  font-size: 24px;
+  color: #333;
+}
+
+.overlay__close {
+  border: none;
+  background-color: transparent;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.overlay__form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  max-height: 600px; /* Chiều cao tối đa của form */
+  overflow-y: auto; /* Bật scroll bar dọc */
+  padding: 10px;
+}
+
+.overlay__form label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: #333;
+}
+
+.overlay__form input {
+  padding: 8px;
+  font-size: 14px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.overlay__update-button {
+  padding: 10px;
+  font-size: 16px;
+  color: white;
+  background-color: #4caf50;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.overlay__update-button:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+}
+.nodrop {
+  white-space: nowrap;
+}
