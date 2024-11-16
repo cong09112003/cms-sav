@@ -2,6 +2,7 @@ import { Fragment, useState, useEffect } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Overlay.css";
+import { useNavigate } from "react-router-dom";
 
 export function OverlayDeleteUser({
   isOpenDelete,
@@ -9,24 +10,30 @@ export function OverlayDeleteUser({
   selectedUser,
   refreshUsers,
 }) {
+  const navigate = useNavigate();
+
   const handleDelete = async () => {
     const token = localStorage.getItem("sav-token");
-    try {
-      await axios.delete(
-        `https://be-android-project.onrender.com/api/auth/user/${selectedUser._id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+    if (token) {
+      try {
+        await axios.delete(
+          `https://be-android-project.onrender.com/api/auth/user/${selectedUser._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      alert("Xóa người dùng thành công!");
-      refreshUsers();
-      onClose();
-    } catch (error) {
-      console.error("Xóa người dùng thất bại:", error);
-      alert("Không thể xóa người dùng.");
+        alert("Xóa người dùng thành công!");
+        refreshUsers();
+        onClose();
+      } catch (error) {
+        console.error("Xóa người dùng thất bại:", error);
+        alert("Không thể xóa người dùng.");
+      }
+    } else {
+      navigate("/login");
     }
   };
   return (
@@ -45,8 +52,7 @@ export function OverlayDeleteUser({
             <h2 style={{ color: "black" }}>Delete User</h2>
             <form className="overlay__form">
               <label class="nodrop">
-                Are you sure delete user with username "{" "}
-                {selectedUser?.username}
+                Are you sure delete user with username "{selectedUser?.username}
                 "?
               </label>
               <button
@@ -55,7 +61,7 @@ export function OverlayDeleteUser({
                 disabled={!isOpenDelete}
                 className="overlay__update-button"
               >
-                Accept
+                Accept delete user
               </button>
             </form>
           </div>

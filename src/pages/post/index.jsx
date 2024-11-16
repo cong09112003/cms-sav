@@ -13,6 +13,10 @@ import { MdPostAdd } from "react-icons/md";
 import OverlayEditPost from "./overlayEdit";
 import OverlayDeletePost from "./overlayDelete";
 import OverlayAddPost from "./overlayAdd";
+import { FaTableCellsRowLock } from "react-icons/fa6";
+import OverlaySetDeletePost from "./overlaySetDelete";
+import { FaFileCircleCheck } from "react-icons/fa6";
+import OverlayActivePost from "./overlayActive";
 const Post = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -22,12 +26,14 @@ const Post = () => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenSetDelete, setIsOpenSetDelete] = useState(false);
+  const [isOpenActive, setIsOpenActive] = useState(false);
 
   const statusPost = ["Active", "Inactive", "Deleted", "Pending", "Locked"];
   const statusPostColors = {
     Active: "#23ca02",
     Inactive: "#ec8a0e",
-    Deleted: "#ff0032",
+    Deleted: "#FF6347",
     Pending: "10d89e",
     Locked: "#ff0000",
   };
@@ -37,7 +43,7 @@ const Post = () => {
     Single: "#23ca02",
     Shared: "#ec8a0e",
     Apartment: "#ff0032",
-    Dormitory: "#10d89e",
+    Dormitory: "#FFD700",
     Double: "#10d8b1",
   };
 
@@ -54,6 +60,17 @@ const Post = () => {
   const toggleOverlayAdd = () => {
     setIsOpenAdd(!isOpenAdd);
   };
+
+  const toggleOverlaySetDelete = (post) => {
+    setSelectedPost(post);
+    setIsOpenSetDelete(!isOpenSetDelete);
+  };
+
+  const toggleOverlayActive = (post) => {
+    setSelectedPost(post);
+    setIsOpenActive(!isOpenActive);
+  };
+
   const getPosts = async () => {
     const token = localStorage.getItem("sav-token");
 
@@ -612,7 +629,7 @@ const Post = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 200,
       headerAlign: "center",
       renderCell: (params) => (
         <Box
@@ -622,6 +639,13 @@ const Post = () => {
           width="100%"
           height="100%"
         >
+          <IconButton
+            onClick={() => {
+              toggleOverlayActive(params.row);
+            }}
+          >
+            <FaFileCircleCheck color="#00a12b" />
+          </IconButton>
           <IconButton
             onClick={() => {
               toggleOverlayEdit(params.row);
@@ -634,7 +658,14 @@ const Post = () => {
               toggleOverlayDelete(params.row);
             }}
           >
-            <AiFillDelete color="red" />
+            <AiFillDelete color="#cc1212" />
+          </IconButton>
+          <IconButton
+            onClick={() => {
+              toggleOverlaySetDelete(params.row);
+            }}
+          >
+            <FaTableCellsRowLock color="#FA8072" />
           </IconButton>
         </Box>
       ),
@@ -696,7 +727,7 @@ const Post = () => {
       )}
       {isOpenDelete && (
         <OverlayDeletePost
-          isOpenEdit={isOpenDelete}
+          isOpenDelete={isOpenDelete}
           onClose={toggleOverlayDelete}
           selectedPost={selectedPost}
           refreshPosts={getPosts}
@@ -704,10 +735,26 @@ const Post = () => {
       )}
       {isOpenAdd && (
         <OverlayAddPost
-          isOpenEdit={isOpenAdd}
+          isOpenAdd={isOpenAdd}
           onClose={toggleOverlayAdd}
           refreshPosts={getPosts}
         ></OverlayAddPost>
+      )}
+      {isOpenSetDelete && (
+        <OverlaySetDeletePost
+          isOpenSetDelete={isOpenSetDelete}
+          onClose={toggleOverlaySetDelete}
+          selectedPost={selectedPost}
+          refreshPosts={getPosts}
+        ></OverlaySetDeletePost>
+      )}
+      {isOpenActive && (
+        <OverlayActivePost
+          isOpenActive={isOpenActive}
+          onClose={toggleOverlayActive}
+          selectedPost={selectedPost}
+          refreshPosts={getPosts}
+        ></OverlayActivePost>
       )}
     </Box>
   );

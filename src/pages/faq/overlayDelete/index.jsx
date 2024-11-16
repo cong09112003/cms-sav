@@ -1,38 +1,44 @@
-import React, { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import axios from "axios";
 import "./Overlay.css";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import "react-slideshow-image/dist/styles.css";
+import { Label } from "@mui/icons-material";
 
-export function OverlayDeletePost({
+export function OverlayDeleteNotification({
   isOpenDelete,
   onClose,
-  selectedPost,
-  refreshPosts,
+  selectedNotification,
+  refreshNotifications,
 }) {
   const navigate = useNavigate();
+  const [isDelete, setIsDelete] = useState(false);
   const handleDelete = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        await axios.delete(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}`,
+        const response = await axios.delete(
+          `https://be-android-project.onrender.com/api/notification/${selectedNotification._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        alert("Xóa post thành công!");
-        refreshPosts();
+        alert("Xóa thông báo thành công!");
+        setIsDelete(false);
+        refreshNotifications();
         onClose();
       } catch (error) {
-        console.error("Xóa post thất bại:", error);
-        alert("Không thể post.");
+        console.error("Xóa thông báo thất bại:", error);
+        alert("Không thể xóa thông báo.");
       }
     } else {
       navigate("/login");
     }
   };
+
   return (
     <Fragment>
       {isOpenDelete && (
@@ -46,11 +52,14 @@ export function OverlayDeletePost({
                 onClick={onClose}
               />
             </div>
-            <h2 style={{ color: "black" }}>Delete Post</h2>
+
             <form className="overlay__form">
+              <h1 style={{ color: "black" }}>Delete notification</h1>
               <label class="nodrop">
-                Are you sure delete post with title: " {selectedPost?.title} "?
-                of {selectedPost?.landlord.username}
+                Are you sure delete notification for user :
+                {selectedNotification.id_user?.username ||
+                  selectedNotification.id_user?.email ||
+                  "Unknown User"}
               </label>
               <button
                 type="button"
@@ -58,7 +67,7 @@ export function OverlayDeletePost({
                 disabled={!isOpenDelete}
                 className="overlay__update-button"
               >
-                Accept delete post
+                Accept delete notification
               </button>
             </form>
           </div>
@@ -68,4 +77,4 @@ export function OverlayDeletePost({
   );
 }
 
-export default OverlayDeletePost;
+export default OverlayDeleteNotification;

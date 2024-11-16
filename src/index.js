@@ -15,4 +15,4 @@ root.render(
     </BrowserRouter>
   </StrictMode>
 );
-reportWebVitals();
+// reportWebVitals();
