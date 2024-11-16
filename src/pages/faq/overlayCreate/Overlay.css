@@ -85,3 +85,11 @@
 .nodrop {
   white-space: nowrap;
 }
+textarea {
+  width: "100%"; /* Chiều rộng cố định */
+  resize: vertical; /* Chỉ cho phép thay đổi chiều dài */
+  border: 2px solid #4caf50; /* Đường viền màu xanh lá */
+  border-radius: 5px; /* Đường viền bo góc */
+  padding: 10px; /* Khoảng cách bên trong */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng đổ bóng */
+}

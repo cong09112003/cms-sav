@@ -2,32 +2,32 @@ import React, { Fragment } from "react";
 import axios from "axios";
 import "./Overlay.css";
 import { useNavigate } from "react-router-dom";
-
-export function OverlayDeletePost({
-  isOpenDelete,
+export function OverlayActivePost({
+  isOpenActive,
   onClose,
   selectedPost,
   refreshPosts,
 }) {
   const navigate = useNavigate();
-  const handleDelete = async () => {
+  const handleActive = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        await axios.delete(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}`,
+        await axios.put(
+          `https://be-android-project.onrender.com/api/post/${selectedPost._id}/activate`,
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        alert("Xóa post thành công!");
+        alert("Chuyển trạng thái post activated thành công !");
         refreshPosts();
         onClose();
       } catch (error) {
-        console.error("Xóa post thất bại:", error);
-        alert("Không thể post.");
+        console.error("chuyển trạng thái post thất bại:", error);
+        alert("Không thể chuyển trạng thái post activated thành công.");
       }
     } else {
       navigate("/login");
@@ -35,7 +35,7 @@ export function OverlayDeletePost({
   };
   return (
     <Fragment>
-      {isOpenDelete && (
+      {isOpenActive && (
         <div className="overlay">
           <div className="overlay__background" onClick={onClose} />
           <div className="overlay__container">
@@ -46,19 +46,19 @@ export function OverlayDeletePost({
                 onClick={onClose}
               />
             </div>
-            <h2 style={{ color: "black" }}>Delete Post</h2>
+            s<h2 style={{ color: "black" }}>Set status active of Post</h2>
             <form className="overlay__form">
               <label class="nodrop">
-                Are you sure delete post with title: " {selectedPost?.title} "?
-                of {selectedPost?.landlord.username}
+                Are you sure set active post with title: " {selectedPost?.title}
+                " of {selectedPost?.landlord.username} ?
               </label>
               <button
                 type="button"
-                onClick={handleDelete}
-                disabled={!isOpenDelete}
+                onClick={handleActive}
+                disabled={!isOpenActive}
                 className="overlay__update-button"
               >
-                Accept delete post
+                Accept set active post
               </button>
             </form>
           </div>
@@ -68,4 +68,4 @@ export function OverlayDeletePost({
   );
 }
 
-export default OverlayDeletePost;
+export default OverlayActivePost;
