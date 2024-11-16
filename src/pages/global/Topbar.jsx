@@ -24,6 +24,9 @@ const Topbar = () => {
     localStorage.removeItem("sav-token");
     navigate("/login");
   };
+  const openNotification = async () => {
+    navigate("/faq");
+  };
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -56,7 +59,11 @@ const Topbar = () => {
             <DarkModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton>
+        <IconButton
+          onClick={() => {
+            openNotification();
+          }}
+        >
           <NotificationsOutlinedIcon />
         </IconButton>
         <IconButton>

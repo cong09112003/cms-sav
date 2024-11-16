@@ -2,7 +2,6 @@ import React from "react";
 import Dashboard from "../pages/dashboard";
 import Team from "../pages/team";
 import Contacts from "../pages/contacts";
-import Invoices from "../pages/invoices";
 import Form from "../pages/form";
 import Bar from "../pages/bar";
 import Geography from "../pages/geography";
@@ -10,6 +9,7 @@ import Calendar from "../pages/calendar";
 import Pie from "../pages/pie";
 import Line from "../pages/line";
 import FAQ from "../pages/faq";
+import Requests from "../pages/requests";
 const adminRoutes = [
   {
     path: "/",
@@ -24,8 +24,8 @@ const adminRoutes = [
     element: <Contacts />,
   },
   {
-    path: "/invoices",
-    element: <Invoices />,
+    path: "/requests",
+    element: <Requests />,
   },
   {
     path: "/form",

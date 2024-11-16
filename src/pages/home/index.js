@@ -7,13 +7,13 @@ import { Form, Route, Routes } from "react-router-dom";
 import Dashboard from "../dashboard";
 import Team from "../team";
 import Contacts from "../contacts";
-import Invoices from "../invoices";
 import { Bar } from "@nivo/bar";
 import { Pie } from "@nivo/pie";
 import { Line } from "@nivo/line";
 import Calendar from "../calendar";
 import Geography from "../geography";
 import FAQ from "../faq";
+import Requests from "../requests";
 const Home = () => {
   const [theme, colorMode] = useMode();
 
@@ -29,7 +29,7 @@ const Home = () => {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/team" element={<Team />} />
                 <Route path="/contacts" element={<Contacts />} />
-                <Route path="/invoices" element={<Invoices />} />
+                <Route path="/requests" element={<Requests />} />
                 <Route path="/form" element={<Form />} />
                 <Route path="/bar" element={<Bar />} />
                 <Route path="/pie" element={<Pie />} />

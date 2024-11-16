@@ -226,13 +226,6 @@ const MyProSidebar = () => {
               Data
             </Typography>
             <Item
-              title="Manage Posts"
-              to="/post"
-              icon={<BsFillFileEarmarkPostFill size={24} />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="Manage Users"
               to="/contacts"
               icon={<ContactsOutlinedIcon />}
@@ -240,8 +233,15 @@ const MyProSidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Invoices Balances"
-              to="/invoices"
+              title="Manage Posts"
+              to="/post"
+              icon={<BsFillFileEarmarkPostFill size={24} />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Manage Requests"
+              to="/requests"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

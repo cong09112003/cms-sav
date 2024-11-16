@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Box, useTheme, IconButton } from "@mui/material";
+import {
+  Box,
+  useTheme,
+  IconButton,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Typography,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { FaEdit } from "react-icons/fa";
@@ -12,7 +21,9 @@ import axios from "axios";
 import OverlayEditUser from "./overlayEdit";
 import OverlayDeleteUser from "./overlayDelete";
 import OverlayAddUser from "./overlayAdd";
-
+import { MdOutlineFavorite } from "react-icons/md";
+import { FcNews } from "react-icons/fc";
+import OverlayFavorUser from "./overlayFavor";
 const Contacts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -20,7 +31,9 @@ const Contacts = () => {
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
-
+  const [isOpenFavor, setIsOpenFavor] = useState(false);
+  const [roleFilter, setRoleFilter] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]); // Dữ liệu sau khi lọc
   const Role = ["Admin", "User", "Renter"];
   const RoleColors = {
     Admin: "#ff0000",
@@ -42,6 +55,10 @@ const Contacts = () => {
   const toggleOverlayAdd = () => {
     setIsOpenAdd(!isOpenAdd);
   };
+  const toggleOverlayFavor = (user) => {
+    setSelectedUser(user);
+    setIsOpenFavor(!isOpenFavor);
+  };
 
   const getUsers = async () => {
     const token = localStorage.getItem("sav-token");
@@ -59,6 +76,7 @@ const Contacts = () => {
 
         if (response.status === 200) {
           setUsers(response.data);
+          setFilteredUsers(response.data);
         } else {
           alert("Can not get users");
         }
@@ -69,6 +87,17 @@ const Contacts = () => {
       }
     } else {
       navigate("/login");
+    }
+  };
+  const handleFilterChange = (event) => {
+    const selectedRole = event.target.value;
+    setRoleFilter(selectedRole);
+
+    if (selectedRole === "") {
+      setFilteredUsers(users);
+    } else {
+      const filtered = users.filter((user) => user.user_role === selectedRole);
+      setFilteredUsers(filtered);
     }
   };
 
@@ -139,7 +168,7 @@ const Contacts = () => {
           </span>
         </Box>
       ),
-      valueGetter: (params) => params.row.status,
+      valueGetter: (params) => params.row.user_role,
     },
     {
       field: "zipCode",
@@ -184,7 +213,7 @@ const Contacts = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 200,
       headerAlign: "center",
       renderCell: (params) => (
         <Box
@@ -194,6 +223,16 @@ const Contacts = () => {
           width="100%"
           height="100%"
         >
+          {params.row.user_role === Role[1] && (
+            <IconButton onClick={() => toggleOverlayFavor(params.row)}>
+              <MdOutlineFavorite color="#FF1493" />
+            </IconButton>
+          )}
+          {params.row.user_role === Role[2] && (
+            <IconButton onClick={() => {}}>
+              <FcNews />
+            </IconButton>
+          )}
           <IconButton onClick={() => toggleOverlayEdit(params.row)}>
             <FaEdit />
           </IconButton>
@@ -210,13 +249,29 @@ const Contacts = () => {
       <Box m="20px">
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header title="CONTACTS" subtitle="Welcome to your Contacts" />
-          <IconButton
-            onClick={() => {
-              toggleOverlayAdd();
-            }}
-          >
-            <TiUserAddOutline size="30" />
-          </IconButton>
+          <Box display="flex" alignItems="center" gap="10px">
+            <Typography variant="body1" style={{ fontWeight: "bold" }}>
+              Filter by:
+            </Typography>
+            <FormControl>
+              <InputLabel>Role</InputLabel>
+              <Select
+                value={roleFilter}
+                onChange={handleFilterChange}
+                style={{ minWidth: "150px" }}
+              >
+                <MenuItem value="">All</MenuItem>
+                {Role.map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <IconButton onClick={toggleOverlayAdd}>
+              <TiUserAddOutline size="30" />
+            </IconButton>
+          </Box>
         </Box>
         <Box
           m="8px 0 0 0"
@@ -246,7 +301,7 @@ const Contacts = () => {
           }}
         >
           <DataGrid
-            rows={users}
+            rows={filteredUsers}
             columns={columns}
             components={{ Toolbar: GridToolbar }}
             getRowId={(row) => row._id}
@@ -274,6 +329,13 @@ const Contacts = () => {
             onClose={toggleOverlayAdd}
             refreshUsers={getUsers}
           ></OverlayAddUser>
+        )}
+        {isOpenFavor && (
+          <OverlayFavorUser
+            isOpenFavor={isOpenFavor}
+            onClose={toggleOverlayFavor}
+            selectedUser={selectedUser}
+          ></OverlayFavorUser>
         )}
       </Box>
     </div>

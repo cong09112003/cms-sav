@@ -6,7 +6,7 @@ import { mockDataInvoices } from "../../data/mockData";
 
 import Header from "../../components/Header";
 
-const Invoices = () => {
+const Requests = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -74,4 +74,4 @@ const Invoices = () => {
   );
 };
 
-export default Invoices;
+export default Requests;

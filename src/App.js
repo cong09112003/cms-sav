@@ -8,7 +8,6 @@ import axios from "axios";
 import Topbar from "./pages/global/Topbar";
 
 import Dashboard from "./pages/dashboard";
-import Invoices from "./pages/invoices";
 import Contacts from "./pages/contacts";
 import Form from "./pages/form";
 import Calendar from "./pages/calendar";
@@ -20,8 +19,8 @@ import Geography from "./pages/geography";
 import LoginForm from "./form/LoginForm/LoginForm";
 import RegisterForm from "./form/RegisterForm/RegisterForm";
 import Post from "./pages/post";
+import Requests from "./pages/requests";
 
-// Hàm kiểm tra xác thực
 const checkAuth = async () => {
   const token = localStorage.getItem("sav-token");
   if (token) {
@@ -102,7 +101,7 @@ const App = () => {
               <Route path="home" element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="contacts" element={<Contacts />} />
-              <Route path="invoices" element={<Invoices />} />
+              <Route path="requests" element={<Requests />} />
               <Route path="form" element={<Form />} />
               <Route path="bar" element={<Bar />} />
               <Route path="pie" element={<Pie />} />
