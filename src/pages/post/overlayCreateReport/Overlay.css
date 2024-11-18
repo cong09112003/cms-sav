@@ -10,14 +10,15 @@
 }
 
 .overlay__container {
+  background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 30px;
-  width: 800px;
+  padding: 20px;
+  width: 780px;
   max-width: 90%;
   z-index: 10;
 }
@@ -46,6 +47,10 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+
+  max-height: 600px; /* Chiều cao tối đa của form */
+  overflow-y: auto; /* Bật scroll bar dọc */
+  padding: 10px;
 }
 
 .overlay__form label {
@@ -66,7 +71,7 @@
 .overlay__update-button {
   padding: 10px;
   font-size: 16px;
-  /* color: white; */
+  color: white;
   background-color: #4caf50;
   border: none;
   border-radius: 4px;
@@ -77,8 +82,6 @@
   background-color: #ddd;
   cursor: not-allowed;
 }
-.avatar-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px; /* khoảng cách phía dưới nếu cần */
+.nodrop {
+  white-space: nowrap;
 }

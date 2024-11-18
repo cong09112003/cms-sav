@@ -24,6 +24,7 @@ import OverlayAddUser from "./overlayAdd";
 import { MdOutlineFavorite } from "react-icons/md";
 import { FcNews } from "react-icons/fc";
 import OverlayFavorUser from "./overlayFavor";
+import OverlayRequests from "./overlayRequests";
 const Contacts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -32,6 +33,7 @@ const Contacts = () => {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenFavor, setIsOpenFavor] = useState(false);
+  const [isOpenRequests, setIsOpenRequests] = useState(false);
   const [roleFilter, setRoleFilter] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]); // Dữ liệu sau khi lọc
   const Role = ["Admin", "User", "Renter"];
@@ -59,6 +61,10 @@ const Contacts = () => {
     setSelectedUser(user);
     setIsOpenFavor(!isOpenFavor);
   };
+  const toggleOverlayRequest = (user) => {
+    setSelectedUser(user);
+    setIsOpenRequests(!isOpenRequests);
+  };
 
   const getUsers = async () => {
     const token = localStorage.getItem("sav-token");
@@ -66,7 +72,7 @@ const Contacts = () => {
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/auth/users",
+          `${process.env.REACT_APP_API_URL}/api/auth/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -120,7 +126,7 @@ const Contacts = () => {
           height="100%"
         >
           <img
-            src={params.row.avatar || "../../assets/man.png"}
+            src={params.row.avatar.url || "../../assets/man.png"}
             alt="avatar user"
             width="40px"
             height="40px"
@@ -229,7 +235,7 @@ const Contacts = () => {
             </IconButton>
           )}
           {params.row.user_role === Role[2] && (
-            <IconButton onClick={() => {}}>
+            <IconButton onClick={() => toggleOverlayRequest(params.row)}>
               <FcNews />
             </IconButton>
           )}
@@ -336,6 +342,13 @@ const Contacts = () => {
             onClose={toggleOverlayFavor}
             selectedUser={selectedUser}
           ></OverlayFavorUser>
+        )}
+        {isOpenRequests && (
+          <OverlayRequests
+            isOpenRequests={isOpenRequests}
+            onClose={toggleOverlayRequest}
+            selectedUser={selectedUser}
+          ></OverlayRequests>
         )}
       </Box>
     </div>

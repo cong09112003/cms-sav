@@ -19,14 +19,13 @@ import Geography from "./pages/geography";
 import LoginForm from "./form/LoginForm/LoginForm";
 import RegisterForm from "./form/RegisterForm/RegisterForm";
 import Post from "./pages/post";
-import Requests from "./pages/requests";
-
+import Report from "./pages/report";
 const checkAuth = async () => {
   const token = localStorage.getItem("sav-token");
   if (token) {
     try {
       const response = await axios.get(
-        "https://be-android-project.onrender.com/api/auth/me",
+        `${process.env.REACT_APP_API_URL}/api/auth/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -101,7 +100,7 @@ const App = () => {
               <Route path="home" element={<Dashboard />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="contacts" element={<Contacts />} />
-              <Route path="requests" element={<Requests />} />
+              <Route path="reports" element={<Report />} />
               <Route path="form" element={<Form />} />
               <Route path="bar" element={<Bar />} />
               <Route path="pie" element={<Pie />} />

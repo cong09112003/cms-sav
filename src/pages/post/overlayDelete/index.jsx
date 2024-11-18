@@ -15,7 +15,7 @@ export function OverlayDeletePost({
     if (token) {
       try {
         await axios.delete(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}`,
+          `${process.env.REACT_APP_API_URL}/api/post/${selectedPost._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -48,9 +48,11 @@ export function OverlayDeletePost({
             </div>
             <h2 style={{ color: "black" }}>Delete Post</h2>
             <form className="overlay__form">
-              <label class="nodrop">
-                Are you sure delete post with title: " {selectedPost?.title} "?
-                of {selectedPost?.landlord.username}
+              <label className="nodrop">
+                <>
+                  Are you sure delete post with title: "{selectedPost?.title}"
+                  {selectedPost?.landlord && selectedPost?.landlord.username}?
+                </>
               </label>
               <button
                 type="button"

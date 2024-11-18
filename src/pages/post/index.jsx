@@ -5,7 +5,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FcOk } from "react-icons/fc";
+import { FcComments, FcOk } from "react-icons/fc";
 import { MdNotInterested } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
@@ -17,6 +17,7 @@ import { FaTableCellsRowLock } from "react-icons/fa6";
 import OverlaySetDeletePost from "./overlaySetDelete";
 import { FaFileCircleCheck } from "react-icons/fa6";
 import OverlayActivePost from "./overlayActive";
+import OverlayComments from "./overlayComment";
 const Post = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -28,7 +29,7 @@ const Post = () => {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenSetDelete, setIsOpenSetDelete] = useState(false);
   const [isOpenActive, setIsOpenActive] = useState(false);
-
+  const [isOpenComments, setIsOpenComments] = useState(false);
   const statusPost = ["Active", "Inactive", "Deleted", "Pending", "Locked"];
   const statusPostColors = {
     Active: "#23ca02",
@@ -70,6 +71,10 @@ const Post = () => {
     setSelectedPost(post);
     setIsOpenActive(!isOpenActive);
   };
+  const toggleOverlayComments = (post) => {
+    setSelectedPost(post);
+    setIsOpenComments(!isOpenComments);
+  };
 
   const getPosts = async () => {
     const token = localStorage.getItem("sav-token");
@@ -77,7 +82,7 @@ const Post = () => {
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/post/getAll",
+          `${process.env.REACT_APP_API_URL}/api/post/getAll`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -629,7 +634,7 @@ const Post = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 200,
+      width: 250,
       headerAlign: "center",
       renderCell: (params) => (
         <Box
@@ -639,33 +644,24 @@ const Post = () => {
           width="100%"
           height="100%"
         >
-          <IconButton
-            onClick={() => {
-              toggleOverlayActive(params.row);
-            }}
-          >
+          <IconButton onClick={() => toggleOverlayComments(params.row)}>
+            <FcComments />
+          </IconButton>
+
+          <IconButton onClick={() => toggleOverlayActive(params.row)}>
             <FaFileCircleCheck color="#00a12b" />
           </IconButton>
-          <IconButton
-            onClick={() => {
-              toggleOverlayEdit(params.row);
-            }}
-          >
+
+          <IconButton onClick={() => toggleOverlaySetDelete(params.row)}>
+            <FaTableCellsRowLock color="#FA8072" />
+          </IconButton>
+
+          <IconButton onClick={() => toggleOverlayEdit(params.row)}>
             <FaEdit />
           </IconButton>
-          <IconButton
-            onClick={() => {
-              toggleOverlayDelete(params.row);
-            }}
-          >
+
+          <IconButton onClick={() => toggleOverlayDelete(params.row)}>
             <AiFillDelete color="#cc1212" />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              toggleOverlaySetDelete(params.row);
-            }}
-          >
-            <FaTableCellsRowLock color="#FA8072" />
           </IconButton>
         </Box>
       ),
@@ -755,6 +751,13 @@ const Post = () => {
           selectedPost={selectedPost}
           refreshPosts={getPosts}
         ></OverlayActivePost>
+      )}
+      {isOpenComments && (
+        <OverlayComments
+          isOpenComments={isOpenComments}
+          onClose={toggleOverlayComments}
+          selectedPost={selectedPost}
+        ></OverlayComments>
       )}
     </Box>
   );

@@ -14,7 +14,7 @@ export function OverlaySetDeletePost({
     if (token) {
       try {
         await axios.put(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}/delete`,
+          `${process.env.REACT_APP_API_URL}/api/post/${selectedPost._id}/delete`,
           {},
           {
             headers: {
@@ -48,9 +48,13 @@ export function OverlaySetDeletePost({
             </div>
             s<h2 style={{ color: "black" }}>Set status delete of Post</h2>
             <form className="overlay__form">
-              <label class="nodrop">
-                Are you sure set delete post with title: " {selectedPost?.title}
-                " of {selectedPost?.landlord.username} ?
+              <label className="nodrop">
+                {selectedPost?.landlord && (
+                  <>
+                    Are you sure set deleted post with title: "
+                    {selectedPost?.title}" of {selectedPost?.landlord.username}?
+                  </>
+                )}
               </label>
               <button
                 type="button"

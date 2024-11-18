@@ -59,7 +59,7 @@ const MyProSidebar = () => {
       if (token) {
         try {
           const response = await axios.get(
-            "https://be-android-project.onrender.com/api/auth/me",
+            `${process.env.REACT_APP_API_URL}/api/auth/me`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -192,7 +192,7 @@ const MyProSidebar = () => {
                   alt="profile user"
                   width="110px"
                   height="110px"
-                  src={user?.avatar || "../../assets/man.png"}
+                  src={user?.avatar.url || "../../assets/man.png"}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
@@ -240,8 +240,8 @@ const MyProSidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Manage Requests"
-              to="/requests"
+              title="Manage Reports"
+              to="/reports"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

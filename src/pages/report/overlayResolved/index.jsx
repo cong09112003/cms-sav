@@ -1,36 +1,32 @@
-import { Fragment, useState, useEffect } from "react";
+import React, { Fragment } from "react";
 import axios from "axios";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Overlay.css";
 import { useNavigate } from "react-router-dom";
-
-export function OverlayDeleteUser({
-  isOpenDelete,
+export function OverlayResolved({
+  isOpenResolved,
   onClose,
-  selectedUser,
-  refreshUsers,
+  selectedReport,
+  refreshReports,
 }) {
   const navigate = useNavigate();
-
-  const handleDelete = async () => {
+  const handleResolved = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/auth/user/${selectedUser._id}`,
+        await axios.patch(
+          `${process.env.REACT_APP_API_URL}/api/report/${selectedReport._id}/status/resolved`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-
-        alert("Xóa người dùng thành công!");
-        refreshUsers();
+        alert("Set report resolved thành công !");
+        refreshReports();
         onClose();
       } catch (error) {
-        console.error("Xóa người dùng thất bại:", error);
-        alert("Không thể xóa người dùng.");
+        console.error("Set report resolved thất bại:", error);
+        alert("Không thể set report resolved thành công.");
       }
     } else {
       navigate("/login");
@@ -38,7 +34,7 @@ export function OverlayDeleteUser({
   };
   return (
     <Fragment>
-      {isOpenDelete && (
+      {isOpenResolved && (
         <div className="overlay">
           <div className="overlay__background" onClick={onClose} />
           <div className="overlay__container">
@@ -49,19 +45,23 @@ export function OverlayDeleteUser({
                 onClick={onClose}
               />
             </div>
-            <h2 style={{ color: "black" }}>Delete User</h2>
+            <h2 style={{ color: "black" }}>Set resolved report</h2>
             <form className="overlay__form">
-              <label class="nodrop">
-                Are you sure delete user with username "{selectedUser?.username}
-                "?
+              <label className="nodrop">
+                {selectedReport?.id_user && (
+                  <>
+                    Are you sure set resolved report "{selectedReport?._id}" of{" "}
+                    {selectedReport?.id_user.username}?
+                  </>
+                )}
               </label>
               <button
                 type="button"
-                onClick={handleDelete}
-                disabled={!isOpenDelete}
+                onClick={handleResolved}
+                disabled={!isOpenResolved}
                 className="overlay__update-button"
               >
-                Accept delete user
+                Accept set resolved report
               </button>
             </form>
           </div>
@@ -71,4 +71,4 @@ export function OverlayDeleteUser({
   );
 }
 
-export default OverlayDeleteUser;
+export default OverlayResolved;

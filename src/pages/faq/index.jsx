@@ -31,7 +31,7 @@ const FAQ = () => {
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/notification",
+          `${process.env.REACT_APP_API_URL}/api/notification`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

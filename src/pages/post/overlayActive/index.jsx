@@ -14,7 +14,7 @@ export function OverlayActivePost({
     if (token) {
       try {
         await axios.put(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}/activate`,
+          `${process.env.REACT_APP_API_URL}/api/post/${selectedPost._id}/activate`,
           {},
           {
             headers: {
@@ -48,10 +48,15 @@ export function OverlayActivePost({
             </div>
             s<h2 style={{ color: "black" }}>Set status active of Post</h2>
             <form className="overlay__form">
-              <label class="nodrop">
-                Are you sure set active post with title: " {selectedPost?.title}
-                " of {selectedPost?.landlord.username} ?
+              <label className="nodrop">
+                {selectedPost?.landlord && (
+                  <>
+                    Are you sure set active post with title: "
+                    {selectedPost?.title}" of {selectedPost?.landlord.username}?
+                  </>
+                )}
               </label>
+
               <button
                 type="button"
                 onClick={handleActive}

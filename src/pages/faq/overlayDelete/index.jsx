@@ -19,7 +19,7 @@ export function OverlayDeleteNotification({
     if (token) {
       try {
         const response = await axios.delete(
-          `https://be-android-project.onrender.com/api/notification/${selectedNotification._id}`,
+          `${process.env.REACT_APP_API_URL}/api/notification/${selectedNotification._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

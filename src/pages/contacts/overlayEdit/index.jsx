@@ -17,7 +17,10 @@ export function OverlayEditUser({
     phone: "",
     address: "",
     password: "",
-    avatar: "",
+    avatar: {
+      url: "",
+      public_id: "",
+    },
     isOnline: false,
   });
   const [isUpdated, setIsUpdated] = useState(false);
@@ -30,7 +33,10 @@ export function OverlayEditUser({
         email: selectedUser.email,
         phone: selectedUser.phone,
         address: selectedUser.address,
-        avatar: selectedUser.avatar,
+        avatar: {
+          url: selectedUser.avatar.url,
+          public_id: selectedUser.avatar.public_id,
+        },
         isOnline: selectedUser.isOnline,
         password: "",
       });
@@ -39,10 +45,22 @@ export function OverlayEditUser({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      if (name === "avatar") {
+        return {
+          ...prev,
+          avatar: {
+            ...prev.avatar,
+            url: value,
+          },
+        };
+      }
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+
     setIsUpdated(true);
   };
 
@@ -78,7 +96,7 @@ export function OverlayEditUser({
         }
 
         await axios.put(
-          `https://be-android-project.onrender.com/api/auth/update/${selectedUser._id}`,
+          `${process.env.REACT_APP_API_URL}/api/auth/users/${selectedUser._id}`,
           requestBody,
           {
             headers: {
@@ -117,7 +135,7 @@ export function OverlayEditUser({
             <form className="overlay__form">
               <div className="avatar-container">
                 <img
-                  src={formData.avatar}
+                  src={formData.avatar.url}
                   alt="avatar user"
                   width="150px"
                   height="150px"
@@ -133,7 +151,7 @@ export function OverlayEditUser({
                 <input
                   type="text"
                   name="avatar"
-                  value={formData.avatar}
+                  value={formData.avatar.url}
                   onChange={handleInputChange}
                 />
               </label>

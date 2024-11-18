@@ -11,30 +11,30 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import { tokens } from "../../../theme";
 import Header from "../../../components/Header";
 import CloseIcon from "@mui/icons-material/Close";
-export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
+export function OverlayRequests({ isOpenRequests, onClose, selectedUser }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [favorites, setFavorites] = useState([]);
+  const [Requests, setRequests] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
-    if (isOpenFavor) getFavouritesForUser();
-  }, [isOpenFavor]);
+    if (isOpenRequests) getRequestsForUser();
+  }, [isOpenRequests]);
 
-  const getFavouritesForUser = async () => {
+  const getRequestsForUser = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/favorite/user/${selectedUser._id}`,
+          `${process.env.REACT_APP_API_URL}/api/request/renter/${selectedUser._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setFavorites(response.data);
+        setRequests(response.data);
       } catch (error) {
-        setFavorites([]);
+        setRequests([]);
       }
     } else {
       navigate("/login");
@@ -43,13 +43,13 @@ export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
 
   return (
     <Fragment>
-      {isOpenFavor && (
+      {isOpenRequests && (
         <Box className="overlay">
           <Box className="overlay__background" onClick={onClose} />
           <Box
             sx={{
               m: "20px",
-              backgroundColor: "#F08080",
+              backgroundColor: "#e0a001",
             }}
             className="overlay__container"
           >
@@ -60,8 +60,8 @@ export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
             >
               <Box display="flex" alignItems="center" gap="5px">
                 <Header
-                  title="Favorites"
-                  subtitle={`Get All Favourites Posts Of 
+                  title="Requests"
+                  subtitle={`Get All Requests Posts Of Renter
                 ${selectedUser.username}`}
                 />
                 <Box
@@ -86,31 +86,49 @@ export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
                 paddingRight: "10px", // Khoảng cách để hiển thị thanh cuộn đẹp
               }}
             >
-              {favorites.length > 0 ? (
-                favorites.map((favorite, index) => (
+              {Requests.length > 0 ? (
+                Requests.map((req, index) => (
                   <Accordion key={index} defaultExpanded={index === 0}>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                       <Typography color={colors.greenAccent[500]} variant="h5">
-                        <Typography>
-                          {favorite.id_post.title} - {""}
-                          {favorite.id_post.location.address} ,
-                          {favorite.id_post.location.district},
-                          {favorite.id_post.location.city}
+                        <Typography
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Box
+                            component="img"
+                            src={req?.id_user_rent.avatar.url}
+                            alt="header image"
+                            width="45px"
+                            height="45px"
+                            sx={{
+                              borderRadius: "50%",
+                              marginRight: "10px",
+                            }}
+                          />
+                          {req.id_user_rent.username} - {req.id_user_rent.phone}{" "}
+                          - {req.id_user_rent.email}
                         </Typography>
                       </Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Typography variant="h6">Post details:</Typography>
+                      <Typography variant="h6">
+                        Requests Post Details:
+                      </Typography>
                       <Typography variant="body1" color="textSecondary">
-                        {favorite.id_post.description}
+                        Title: {req.id_post.title}
+                      </Typography>
+                      <Typography variant="body1" color="textSecondary">
+                        {req.id_post.description}
                       </Typography>
                       <Typography color={colors.redAccent[500]} variant="h7">
-                        {favorite.id_post.landlord && (
+                        {req.id_post.landlord && (
                           <Typography>
-                            Landlord: {favorite.id_post.landlord.username}
+                            Landlord: {req.id_post.landlord.username}
                             <Box
                               component="img"
-                              src={favorite?.id_post.landlord.avatar.url}
+                              src={req?.id_post.landlord.avatar.url}
                               alt="header image"
                               width="25px"
                               height="25px"
@@ -127,14 +145,14 @@ export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
                           style: "currency",
                           currency: "VND",
                           minimumFractionDigits: 0,
-                        }).format(favorite.id_post.price)}
+                        }).format(req.id_post.price)}
                         /month
                       </Typography>
                     </AccordionDetails>
                   </Accordion>
                 ))
               ) : (
-                <Typography>No favourite posts.</Typography>
+                <Typography>No favourite requests.</Typography>
               )}
             </Box>
           </Box>
@@ -144,4 +162,4 @@ export function OverlayFavorUser({ isOpenFavor, onClose, selectedUser }) {
   );
 }
 
-export default OverlayFavorUser;
+export default OverlayRequests;

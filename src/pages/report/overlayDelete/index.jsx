@@ -1,36 +1,32 @@
-import { Fragment, useState, useEffect } from "react";
+import React, { Fragment } from "react";
 import axios from "axios";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Overlay.css";
 import { useNavigate } from "react-router-dom";
-
-export function OverlayDeleteUser({
+export function OverlayDelete({
   isOpenDelete,
   onClose,
-  selectedUser,
-  refreshUsers,
+  selectedReport,
+  refreshReports,
 }) {
   const navigate = useNavigate();
-
   const handleDelete = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
         await axios.delete(
-          `${process.env.REACT_APP_API_URL}/api/auth/user/${selectedUser._id}`,
+          `${process.env.REACT_APP_API_URL}/api/report/delete/${selectedReport._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-
-        alert("Xóa người dùng thành công!");
-        refreshUsers();
+        alert("Xóa report thành công !");
+        refreshReports();
         onClose();
       } catch (error) {
-        console.error("Xóa người dùng thất bại:", error);
-        alert("Không thể xóa người dùng.");
+        console.error("Xóa report thất bại:", error);
+        alert("Không thể xóa report thành công.");
       }
     } else {
       navigate("/login");
@@ -49,11 +45,15 @@ export function OverlayDeleteUser({
                 onClick={onClose}
               />
             </div>
-            <h2 style={{ color: "black" }}>Delete User</h2>
+            <h2 style={{ color: "black" }}>Delete report</h2>
             <form className="overlay__form">
-              <label class="nodrop">
-                Are you sure delete user with username "{selectedUser?.username}
-                "?
+              <label className="nodrop">
+                {selectedReport?.id_user && (
+                  <>
+                    Are you sure set deleted report "{selectedReport?._id}" of{" "}
+                    {selectedReport?.id_user.username}?
+                  </>
+                )}
               </label>
               <button
                 type="button"
@@ -61,7 +61,7 @@ export function OverlayDeleteUser({
                 disabled={!isOpenDelete}
                 className="overlay__update-button"
               >
-                Accept delete user
+                Accept delete report
               </button>
             </form>
           </div>
@@ -71,4 +71,4 @@ export function OverlayDeleteUser({
   );
 }
 
-export default OverlayDeleteUser;
+export default OverlayDelete;

@@ -184,7 +184,7 @@ export function OverlayEditPost({
           status: formData.status,
         };
         await axios.put(
-          `https://be-android-project.onrender.com/api/post/${selectedPost._id}`,
+          `${process.env.REACT_APP_API_URL}/api/post/${selectedPost._id}`,
           requestBody,
           {
             headers: {
@@ -210,7 +210,7 @@ export function OverlayEditPost({
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/auth/users",
+          `${process.env.REACT_APP_API_URL}/api/auth/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -526,7 +526,7 @@ export function OverlayEditPost({
                   onChange={handleInputChange}
                 />
               </label>
-              <label>
+              {/* <label>
                 <h3 style={{ color: "black" }}>Images</h3>
                 <Slide
                   autoplay={false} // Tắt chế độ tự động chuyển slide
@@ -599,7 +599,7 @@ export function OverlayEditPost({
                     Add Image
                   </button>
                 </div>
-              </label>
+              </label> */}
               <label>
                 Average Rating
                 <div

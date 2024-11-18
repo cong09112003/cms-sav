@@ -17,8 +17,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  padding: 30px;
-  width: 600px;
+  padding: 20px;
+  width: 780px;
   max-width: 90%;
   z-index: 10;
 }
@@ -47,6 +47,10 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+
+  max-height: 600px; /* Chiều cao tối đa của form */
+  overflow-y: auto; /* Bật scroll bar dọc */
+  padding: 10px;
 }
 
 .overlay__form label {
@@ -78,8 +82,6 @@
   background-color: #ddd;
   cursor: not-allowed;
 }
-.avatar-container {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px; /* khoảng cách phía dưới nếu cần */
+.nodrop {
+  white-space: nowrap;
 }

@@ -7,7 +7,7 @@ const checkAuth = async () => {
     // return true;
     try {
       const response = await axios.get(
-        "https://be-android-project.onrender.com/api/auth/me",
+        `${process.env.REACT_APP_API_URL}/api/auth/me`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

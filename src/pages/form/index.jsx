@@ -31,7 +31,7 @@ const Form = () => {
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/auth/me",
+          `${process.env.REACT_APP_API_URL}/api/auth/me`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -68,7 +68,7 @@ const Form = () => {
     if (token) {
       try {
         await axios.put(
-          `https://be-android-project.onrender.com/api/auth/update/${formData._id}`,
+          `${process.env.REACT_APP_API_URL}/api/auth/update/${formData._id}`,
           values,
           {
             headers: {
@@ -137,7 +137,7 @@ const Form = () => {
               <Box
                 component="img"
                 src={
-                  values.avatar ||
+                  values.avatar.url ||
                   "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"
                 }
                 onError={(e) =>
@@ -163,7 +163,7 @@ const Form = () => {
                   handleChange(e);
                   setFormData({ ...formData, avatar: e.target.value });
                 }}
-                value={values.avatar}
+                value={values.avatar.url}
                 name="avatar"
                 sx={{ gridColumn: "span 4" }}
               />

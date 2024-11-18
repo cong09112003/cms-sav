@@ -42,7 +42,7 @@ export function OverlayAddUser({ isOpenAdd, onClose, refreshUsers }) {
           avatar: formData.avatar,
         };
         await axios.post(
-          `https://be-android-project.onrender.com/api/auth/admin/create-user`,
+          `${process.env.REACT_APP_API_URL}/api/auth/admin/create-user`,
           requestBody,
           {
             headers: {

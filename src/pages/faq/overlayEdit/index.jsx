@@ -29,7 +29,7 @@ export function OverlayEditNotification({
     if (token) {
       try {
         const response = await axios.put(
-          `https://be-android-project.onrender.com/api/notification/${selectedNotification._id}`,
+          `${process.env.REACT_APP_API_URL}/api/notification/${selectedNotification._id}`,
           formData,
           {
             headers: {
@@ -55,7 +55,7 @@ export function OverlayEditNotification({
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/auth/users",
+          "${process.env.REACT_APP_API_URL}/api/auth/users",
           {
             headers: {
               Authorization: `Bearer ${token}`,

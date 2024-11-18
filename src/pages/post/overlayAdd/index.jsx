@@ -180,7 +180,7 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
           status: formData.status,
         };
         await axios.post(
-          "https://be-android-project.onrender.com/api/post/create",
+          `${process.env.REACT_APP_API_URL}/api/post/create`,
           requestBody,
           {
             headers: {
@@ -206,7 +206,7 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
     if (token) {
       try {
         const response = await axios.get(
-          "https://be-android-project.onrender.com/api/auth/users",
+          `${process.env.REACT_APP_API_URL}/api/auth/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
