@@ -46,9 +46,11 @@ function LoginForm() {
         { email, password }
       );
       const { token, user } = response.data;
+      if (response.data.user.user_role !== "Admin") {
+        setLoginError("Unable to access: You must be an Admin.");
+        return; // Dừng thực thi nếu không phải Admin
+      }
       localStorage.setItem("sav-token", token);
-      console.log(response);
-      console.log(token);
       navigate("/home");
     } catch (error) {
       console.error(

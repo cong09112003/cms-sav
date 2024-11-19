@@ -27,8 +27,6 @@ const Dashboard = () => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box m="20px">
-      {/* HEADER */}
-
       <Box
         display={smScreen ? "flex" : "block"}
         flexDirection={smScreen ? "row" : "column"}
@@ -36,7 +34,7 @@ const Dashboard = () => {
         alignItems={smScreen ? "center" : "start"}
         m="10px 0"
       >
-        <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
+        <Header title="SAV" subtitle="Welcome to your SAV CMS" />
 
         <Box>
           <Button
@@ -54,7 +52,6 @@ const Dashboard = () => {
         </Box>
       </Box>
 
-      {/* GRID & CHARTS */}
       <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
         <Grid xs={12} sm={12} md={6} lg={3} xl={3}>
           <Box
