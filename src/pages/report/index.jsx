@@ -8,7 +8,6 @@ import Header from "../../components/Header";
 import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoIosCreate } from "react-icons/io";
 import { SiDavinciresolve } from "react-icons/si";
 import { RiDeleteBin5Fill } from "react-icons/ri";
 import OverlayDelete from "./overlayDelete";
@@ -25,6 +24,12 @@ const Report = () => {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
 
   const navigate = useNavigate();
+  const statusReport = ["Pending", "Pending", "Resolved"];
+  const statusReportColors = {
+    Pending: "#23ca02",
+    Resolved: "#FF6347",
+    Resolved: "10d89e",
+  };
 
   const toggleOverlayDetail = (report) => {
     setSelectedReport(report);
@@ -278,6 +283,34 @@ const Report = () => {
       ),
     },
     {
+      field: "status",
+      headerName: "Status",
+      width: 150,
+      headerAlign: "center",
+      renderCell: (params) => {
+        const status = params.row.status; // Giả sử `status` được lấy từ API trong row
+        const statusColor = statusReportColors[status] || "#000"; // Mặc định là màu đen nếu không tìm thấy màu
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            style={{
+              backgroundColor: statusColor,
+              color: "#fff",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              textAlign: "center",
+            }}
+          >
+            {status || "Unknown"}
+          </Box>
+        );
+      },
+    },
+    {
       field: "actions",
       headerName: "Actions",
       width: 250,
@@ -294,13 +327,13 @@ const Report = () => {
             <BiSolidDetail />
           </IconButton>
           <IconButton onClick={() => toggleOverlayProcessing(params.row)}>
-            <AiOutlineDeliveredProcedure />
+            <AiOutlineDeliveredProcedure color={colors.blueAccent[600]} />
           </IconButton>
           <IconButton onClick={() => toggleOverlayResolved(params.row)}>
-            <SiDavinciresolve />
+            <SiDavinciresolve color={colors.greenAccent[600]} />
           </IconButton>
           <IconButton onClick={() => toggleOverlayDelete(params.row)}>
-            <RiDeleteBin5Fill />
+            <RiDeleteBin5Fill color={colors.redAccent[600]} />
           </IconButton>
         </Box>
       ),
@@ -309,7 +342,7 @@ const Report = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="POST" subtitle="Welcome to posts" />
+        <Header title="Report" subtitle="Welcome to report of posts" />
       </Box>
       <Box
         m="8px 0 0 0"

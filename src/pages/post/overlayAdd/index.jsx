@@ -258,7 +258,7 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
               <label>
                 Description
                 <input
-                  type="text"
+                  type="textx"
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}

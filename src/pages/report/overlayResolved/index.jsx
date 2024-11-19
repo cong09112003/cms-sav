@@ -15,6 +15,7 @@ export function OverlayResolved({
       try {
         await axios.patch(
           `${process.env.REACT_APP_API_URL}/api/report/${selectedReport._id}/status/resolved`,
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`,

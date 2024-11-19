@@ -15,6 +15,7 @@ export function OverlayProcessing({
       try {
         await axios.patch(
           `${process.env.REACT_APP_API_URL}/api/report/${selectedReport._id}/status/processing`,
+          {},
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -3,11 +3,14 @@ import axios from "axios";
 import "./Overlay.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { TrySharp } from "@mui/icons-material";
-export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
+
+export function OverlayCreateReport({
+  isOpenCreateReport,
+  onClose,
+  selectedPost,
+}) {
   const navigate = useNavigate();
-  const [isAdd, setIsAdd] = useState(false);
-  const [posts, setPosts] = useState([]);
+  const [isCreateReport, setIsCreateReport] = useState(false);
   const [admin, setAdmin] = useState(null);
   const [formData, setFormData] = useState({
     id_user: "",
@@ -30,7 +33,7 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
         );
 
         if (response.status === 200) {
-          setAdmin(response.body);
+          setAdmin(response.data);
         } else {
           setAdmin(null);
         }
@@ -41,13 +44,28 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
       navigate("/login");
     }
   };
+  useEffect(() => {
+    getAuth();
+  }, []);
 
-  // useEffect(() => {
-  //   if (isOpenCreate) {
-  //     getAuth();
-  //     getAllPosts();
-  //   }
-  // }, [isOpenAdd]);
+  useEffect(() => {
+    if (admin && selectedPost) {
+      setFormData({
+        id_user: admin._id,
+        id_post: selectedPost._id,
+        report_reason: "",
+        description: "",
+      });
+    }
+  }, [admin, selectedPost]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   const handleCreate = async () => {
     const token = localStorage.getItem("sav-token");
@@ -55,7 +73,7 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
       try {
         await axios.post(
           `${process.env.REACT_APP_API_URL}/api/report/create`,
-          {},
+          formData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -63,7 +81,7 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
           }
         );
         alert("Chuyển trạng thái post deleted thành công !");
-        refreshReports();
+        // refreshReports();
         onClose();
       } catch (error) {
         console.error("chuyển trạng thái post thất bại:", error);
@@ -73,9 +91,10 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
       navigate("/login");
     }
   };
+
   return (
     <Fragment>
-      {isOpenCreate && (
+      {isOpenCreateReport && (
         <div className="overlay">
           <div className="overlay__background" onClick={onClose} />
           <div className="overlay__container">
@@ -88,13 +107,31 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
             </div>
             <h2 style={{ color: "black" }}>Create report</h2>
             <form className="overlay__form">
+              <label>
+                Report Reason
+                <input
+                  type="text"
+                  name="report_reason"
+                  value={formData.report_reason}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label>
+                Description
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows="4"
+                />
+              </label>
               <button
                 type="button"
                 onClick={handleCreate}
-                disabled={!isOpenCreate}
+                disabled={!isOpenCreateReport}
                 className="overlay__update-button"
               >
-                Create post
+                Create report
               </button>
             </form>
           </div>
@@ -104,4 +141,4 @@ export function OverlayCreate({ isOpenCreate, onClose, refreshReports }) {
   );
 }
 
-export default OverlayCreate;
+export default OverlayCreateReport;

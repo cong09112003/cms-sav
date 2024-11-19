@@ -6,7 +6,7 @@ import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FcComments, FcOk } from "react-icons/fc";
-import { MdNotInterested } from "react-icons/md";
+import { MdNotInterested, MdReport } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { AiFillDelete } from "react-icons/ai";
 import { MdPostAdd } from "react-icons/md";
@@ -18,6 +18,7 @@ import OverlaySetDeletePost from "./overlaySetDelete";
 import { FaFileCircleCheck } from "react-icons/fa6";
 import OverlayActivePost from "./overlayActive";
 import OverlayComments from "./overlayComment";
+import OverlayCreateReport from "./overlayCreateReport";
 const Post = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -30,6 +31,11 @@ const Post = () => {
   const [isOpenSetDelete, setIsOpenSetDelete] = useState(false);
   const [isOpenActive, setIsOpenActive] = useState(false);
   const [isOpenComments, setIsOpenComments] = useState(false);
+  const [isOpenCreateReport, setIsOpenCreateReport] = useState(false);
+  const [FilterRoomType, setFilterRoomType] = useState("");
+  const [FilterStatus, setFilterStatus] = useState("");
+  const [filteredPosts, setFilteredPosts] = useState([]); // Dữ liệu sau khi lọc
+
   const statusPost = ["Active", "Inactive", "Deleted", "Pending", "Locked"];
   const statusPostColors = {
     Active: "#23ca02",
@@ -74,6 +80,11 @@ const Post = () => {
   const toggleOverlayComments = (post) => {
     setSelectedPost(post);
     setIsOpenComments(!isOpenComments);
+  };
+
+  const toggleOverlayCreateReport = (post) => {
+    setSelectedPost(post);
+    setIsOpenCreateReport(!isOpenCreateReport);
   };
 
   const getPosts = async () => {
@@ -644,6 +655,10 @@ const Post = () => {
           width="100%"
           height="100%"
         >
+          <IconButton onClick={() => toggleOverlayCreateReport(params.row)}>
+            <MdReport />
+          </IconButton>
+
           <IconButton onClick={() => toggleOverlayComments(params.row)}>
             <FcComments />
           </IconButton>
@@ -758,6 +773,14 @@ const Post = () => {
           onClose={toggleOverlayComments}
           selectedPost={selectedPost}
         ></OverlayComments>
+      )}
+
+      {isOpenCreateReport && (
+        <OverlayCreateReport
+          isOpenCreateReport={isOpenCreateReport}
+          onClose={toggleOverlayCreateReport}
+          selectedPost={selectedPost}
+        ></OverlayCreateReport>
       )}
     </Box>
   );
