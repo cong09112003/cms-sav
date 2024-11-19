@@ -55,7 +55,7 @@ export function OverlayEditNotification({
     if (token) {
       try {
         const response = await axios.get(
-          "${process.env.REACT_APP_API_URL}/api/auth/users",
+          `${process.env.REACT_APP_API_URL}/api/auth/users`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -71,9 +71,7 @@ export function OverlayEditNotification({
           alert("Không thể lấy danh sách người dùng");
         }
       } catch (error) {
-        console.error("Lỗi xác thực token:", error);
-        localStorage.removeItem("sav-token");
-        navigate("/login");
+        setUsers([]);
       }
     } else {
       navigate("/login");

@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { AiOutlineDeliveredProcedure } from "react-icons/ai";
@@ -13,6 +22,7 @@ import { RiDeleteBin5Fill } from "react-icons/ri";
 import OverlayDelete from "./overlayDelete";
 import OverlayProcessing from "./overlayProcessing";
 import OverlayResolved from "./overlayResolved";
+import { OverlayDetailReport } from "./overlayDetail";
 const Report = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -22,13 +32,15 @@ const Report = () => {
   const [isOpenProcessing, setIsOpenProcessing] = useState(false);
   const [isOpenResolved, setIsOpenResolved] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [filteredReports, setFilteredReports] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState("All"); // Bộ lọc trạng thái
 
   const navigate = useNavigate();
-  const statusReport = ["Pending", "Pending", "Resolved"];
+  const statusReport = ["All", "Pending", "Processing", "Resolved"];
   const statusReportColors = {
-    Pending: "#23ca02",
-    Resolved: "#FF6347",
-    Resolved: "10d89e",
+    Pending: colors.redAccent[500],
+    Resolved: colors.greenAccent[500],
+    Resolved: colors.blueAccent[500],
   };
 
   const toggleOverlayDetail = (report) => {
@@ -79,6 +91,16 @@ const Report = () => {
   useEffect(() => {
     getReports();
   }, [navigate]);
+
+  useEffect(() => {
+    if (selectedStatus === "All") {
+      setFilteredReports(reports);
+    } else {
+      setFilteredReports(
+        reports.filter((report) => report.status === selectedStatus)
+      );
+    }
+  }, [selectedStatus, reports]);
 
   const columns = [
     { field: "_id", headerName: "ReportId", width: 170 },
@@ -288,8 +310,6 @@ const Report = () => {
       width: 150,
       headerAlign: "center",
       renderCell: (params) => {
-        const status = params.row.status; // Giả sử `status` được lấy từ API trong row
-        const statusColor = statusReportColors[status] || "#000"; // Mặc định là màu đen nếu không tìm thấy màu
         return (
           <Box
             display="flex"
@@ -297,15 +317,15 @@ const Report = () => {
             alignItems="center"
             width="100%"
             height="100%"
-            style={{
-              backgroundColor: statusColor,
-              color: "#fff",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              textAlign: "center",
-            }}
           >
-            {status || "Unknown"}
+            <span
+              style={{
+                color: statusReportColors[params.row.status] || "black", // màu mặc định nếu không khớp
+                fontWeight: "bold",
+              }}
+            >
+              {params.row.status}
+            </span>
           </Box>
         );
       },
@@ -343,6 +363,25 @@ const Report = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="Report" subtitle="Welcome to report of posts" />
+        <Box display="flex" alignItems="center" gap="10px">
+          <Typography variant="body1" style={{ fontWeight: "bold" }}>
+            Filter by:
+          </Typography>
+          <FormControl>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              style={{ minWidth: "150px" }}
+            >
+              {statusReport.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -372,7 +411,7 @@ const Report = () => {
         }}
       >
         <DataGrid
-          rows={reports}
+          rows={filteredReports}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row._id}
@@ -402,6 +441,13 @@ const Report = () => {
           selectedReport={selectedReport}
           refreshReports={getReports}
         ></OverlayResolved>
+      )}
+      {isOpenDetail && (
+        <OverlayDetailReport
+          isOpenDetail={isOpenDetail}
+          onClose={toggleOverlayDetail}
+          selectedReport={selectedReport}
+        ></OverlayDetailReport>
       )}
     </Box>
   );

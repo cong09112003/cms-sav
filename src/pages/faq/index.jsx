@@ -102,7 +102,9 @@ const FAQ = () => {
                   height="100%"
                 >
                   <img
-                    src={notification.id_user?.avatar || "../../assets/man.png"}
+                    src={
+                      notification.id_user?.avatar.url || "../../assets/man.png"
+                    }
                     alt="avatar user"
                     width="50px"
                     height="50px"

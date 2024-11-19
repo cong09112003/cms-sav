@@ -27,6 +27,12 @@ const Topbar = () => {
   const openNotification = async () => {
     navigate("/faq");
   };
+  const openSettings = async () => {
+    navigate("/post");
+  };
+  const openProfile = async () => {
+    navigate("/form");
+  };
 
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
@@ -66,11 +72,19 @@ const Topbar = () => {
         >
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton
+          onClick={() => {
+            openSettings();
+          }}
+        >
           <SettingsOutlinedIcon />
         </IconButton>
         <IconButton>
-          <PersonOutlinedIcon />
+          <PersonOutlinedIcon
+            onClick={() => {
+              openProfile();
+            }}
+          />
         </IconButton>
         <IconButton
           onClick={() => {

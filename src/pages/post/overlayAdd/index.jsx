@@ -25,6 +25,30 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
     { value: "Pending", label: "Pending" },
     { value: "Locked", label: "Locked" },
   ];
+
+  const [previewImages, setPreviewImages] = useState([]);
+
+  const handleAddImages = (e) => {
+    const files = Array.from(e.target.files);
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setPreviewImages((prev) => [...prev, ...newPreviews]);
+
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...files],
+    }));
+    setIsAdd(true);
+  };
+
+  // Xóa ảnh khỏi danh sách
+  const handleDeleteImage = (index) => {
+    setPreviewImages((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -65,7 +89,7 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
     videos: [""],
     averageRating: 0,
     views: 0,
-    status: statusLists[3],
+    status: statusLists[3].value,
   });
   const navigate = useNavigate();
   const [isAdd, setIsAdd] = useState(false);
@@ -74,22 +98,6 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
   useEffect(() => {
     if (isOpenAdd) getReters();
   }, [isOpenAdd]);
-
-  const handleAddImage = () => {
-    if (newImageUrl) {
-      setFormData((prevData) => {
-        const updatedImages = [...prevData.images];
-        updatedImages.push(newImageUrl);
-        return {
-          ...prevData,
-          images: updatedImages,
-        };
-      });
-      setNewImageUrl("");
-      setIsAdd(true);
-    }
-  };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const keys = name.split(".");
@@ -97,9 +105,15 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
     setFormData((prevData) => {
       const newData = { ...prevData };
       let tempData = newData;
+
       keys.forEach((key, index) => {
         if (index === keys.length - 1) {
-          tempData[key] = isNaN(value) ? value : parseFloat(value);
+          // Kiểm tra xem key có thuộc trường cần số hay không
+          const isNumericField = ["price", "size", "availability"].includes(
+            key
+          );
+          tempData[key] =
+            isNumericField && value !== "" ? parseFloat(value) : value;
         } else {
           tempData[key] = { ...tempData[key] };
           tempData = tempData[key];
@@ -111,80 +125,50 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
 
     setIsAdd(true);
   };
-
-  const handleEditImage = (index, newUrl) => {
-    setFormData((prevData) => {
-      const updatedImages = [...prevData.images];
-      updatedImages[index] = newUrl;
-      return {
-        ...prevData,
-        images: updatedImages,
-      };
-    });
-  };
-
-  const handleDeleteImage = (index) => {
-    setFormData((prevData) => {
-      const updatedImages = prevData.images.filter((_, i) => i !== index);
-      return {
-        ...prevData,
-        images: updatedImages,
-      };
-    });
-  };
-
   const handleAdd = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        const requestBody = {
-          title: formData.title,
-          description: formData.description,
-          price: formData.price,
-          location: {
-            address: formData.location.address,
-            city: formData.location.city,
-            district: formData.location.district,
-            ward: formData.location.ward,
-            geoLocation: {
-              type: "Point",
-              coordinates: [
-                formData.location.geoLocation.coordinates.x,
-                formData.location.geoLocation.coordinates.y,
-              ],
-            },
+        const formDataToSend = new FormData();
+        const locationData = {
+          ...formData.location,
+          geoLocation: {
+            ...formData.location.geoLocation,
+            coordinates: [
+              formData.location.geoLocation.coordinates.x,
+              formData.location.geoLocation.coordinates.y,
+            ],
           },
-          landlord: formData.landlord,
-          roomType: formData.roomType,
-          size: formData.size,
-          availability: formData.availability,
-          amenities: {
-            hasWifi: formData.amenities.hasWifi,
-            hasParking: formData.amenities.hasParking,
-            hasAirConditioner: formData.amenities.hasAirConditioner,
-            hasKitchen: formData.amenities.hasKitchen,
-            hasElevator: formData.amenities.hasElevator,
-            other: formData.other,
-          },
-          additionalCosts: {
-            electricity: formData.additionalCosts.electricity,
-            water: formData.additionalCosts.water,
-            internet: formData.additionalCosts.internet,
-            cleaningService: formData.additionalCosts.cleaningService,
-            security: formData.additionalCosts.security,
-          },
-          images: formData.images,
-          videos: formData.videos,
-          averageRating: formData.averageRating,
-          views: formData.views,
-          status: formData.status,
         };
+        const locationJson = JSON.stringify(locationData);
+        formDataToSend.append("location", locationJson);
+        const amenitiesJson = JSON.stringify(formData.amenities);
+        formDataToSend.append("amenities", amenitiesJson);
+        const additionalCostsJson = JSON.stringify(formData.additionalCosts);
+        formDataToSend.append("additionalCosts", additionalCostsJson);
+        formDataToSend.append("title", formData.title);
+        formDataToSend.append("description", formData.description);
+        formDataToSend.append("price", formData.price);
+        formDataToSend.append("landlord", formData.landlord);
+        formDataToSend.append("roomType", formData.roomType);
+        formDataToSend.append("size", formData.size);
+        formDataToSend.append("availability", formData.availability);
+        formDataToSend.append("averageRating", formData.averageRating);
+        formDataToSend.append("views", formData.views);
+        formDataToSend.append("status", formData.status);
+        formData.images.forEach((image, index) => {
+          formDataToSend.append("images", image);
+        });
+        formData.videos.forEach((video, index) =>
+          formDataToSend.append(`videos[${index}]`, video)
+        );
         await axios.post(
           `${process.env.REACT_APP_API_URL}/api/post/create`,
-          requestBody,
+          formDataToSend,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
             },
           }
         );
@@ -193,14 +177,13 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
         refreshPosts();
         onClose();
       } catch (error) {
-        console.error("Thêm bài post thất bại:", error);
+        console.error("Thêm bài post thất bại:", error.response?.data || error);
         alert("Không thể thêm bài post.");
       }
     } else {
       navigate("/login");
     }
   };
-
   const getReters = async () => {
     const token = localStorage.getItem("sav-token");
     if (token) {
@@ -230,7 +213,6 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
       navigate("/login");
     }
   };
-
   return (
     <Fragment>
       {isOpenAdd && (
@@ -477,77 +459,42 @@ export function OverlayAddPost({ isOpenAdd, onClose, refreshPosts }) {
               </label>
               <label>
                 <h3 style={{ color: "black" }}>Images</h3>
-                <Slide
-                  autoplay={false} // Tắt chế độ tự động chuyển slide
-                  canSwipe={true} // Cho phép vuốt qua các ảnh
-                  indicators={true} // Hiển thị chỉ báo (dots)
-                >
-                  {formData.images.map((image, index) => (
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleAddImages}
+                  style={{ marginBottom: "10px" }}
+                />
+                <Slide autoplay={false} indicators={true}>
+                  {previewImages.map((image, index) => (
                     <div
-                      className="each-slide"
-                      key={index} // Đảm bảo key duy nhất cho mỗi slide
+                      key={index}
                       style={{
-                        width: "700px",
-                        height: "700px",
-                        overflow: "hidden",
                         display: "flex",
-                        justifyContent: "center", // Căn giữa theo chiều ngang
-                        alignItems: "center", // Căn giữa theo chiều dọc
                         flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
                       <img
                         src={image}
-                        alt={`${index}`}
+                        alt={`Preview ${index}`}
                         style={{
-                          width: "100%",
-                          height: "100%",
+                          width: "400px",
+                          height: "300px",
                           objectFit: "contain",
                         }}
                       />
-                      <div
-                        style={{
-                          flexDirection: "row",
-                          paddingTop: "10px",
-                          paddingBottom: "50px",
-                        }}
+                      <button
+                        type="button"
+                        className="overlay__update-button"
+                        onClick={() => handleDeleteImage(index)}
                       >
-                        <input
-                          type="text"
-                          placeholder="Edit image URL"
-                          onChange={(e) =>
-                            handleEditImage(index, e.target.value)
-                          }
-                          style={{ minWidth: "400px" }}
-                          value={formData.images[index]}
-                        />
-                        <button
-                          type="button"
-                          className="overlay__update-button"
-                          onClick={() => handleDeleteImage(index)}
-                        >
-                          Xóa
-                        </button>
-                      </div>
+                        Delete
+                      </button>
                     </div>
                   ))}
                 </Slide>
-                <div>
-                  <input
-                    type="text"
-                    value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)} // Cập nhật giá trị input
-                    placeholder="Enter image URL"
-                    style={{ minWidth: "400px" }}
-                  />
-                  <button
-                    type="button"
-                    className="overlay__update-button"
-                    onClick={handleAddImage} // Thêm ảnh vào mảng images
-                  >
-                    Add Image
-                  </button>
-                </div>
               </label>
               <label>
                 Average Rating
