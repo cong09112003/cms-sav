@@ -23,9 +23,11 @@ export function OverlayEditUser({
     },
     isOnline: false,
   });
+  const [selectedFile, setSelectedFile] = useState(null); // Lưu file mới
   const [isUpdated, setIsUpdated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (selectedUser) {
       setFormData({
@@ -45,22 +47,26 @@ export function OverlayEditUser({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => {
-      if (name === "avatar") {
-        return {
-          ...prev,
-          avatar: {
-            ...prev.avatar,
-            url: value,
-          },
-        };
-      }
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setIsUpdated(true);
+  };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData((prev) => ({
+          ...prev,
+          avatar: { ...prev.avatar, url: event.target.result },
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
     setIsUpdated(true);
   };
 
@@ -78,29 +84,30 @@ export function OverlayEditUser({
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        // Xây dựng requestBody chỉ chứa các trường cần cập nhật
-        const requestBody = {
-          username: formData.username,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          avatar: formData.avatar,
-        };
+        const formPayload = new FormData();
+        formPayload.append("username", formData.username);
+        formPayload.append("email", formData.email);
+        formPayload.append("phone", formData.phone);
+        formPayload.append("address", formData.address);
+        formPayload.append("isOnline", formData.isOnline);
 
-        // Chỉ thêm password và isOnline vào requestBody nếu chúng đã thay đổi
         if (formData.password) {
-          requestBody.password = formData.password;
+          formPayload.append("password", formData.password);
         }
-        if (formData.isOnline !== selectedUser.isOnline) {
-          requestBody.isOnline = formData.isOnline;
+
+        if (selectedFile) {
+          formPayload.append("avatar", selectedFile); // Gửi file mới
+        } else {
+          formPayload.append("avatar", JSON.stringify(formData.avatar)); // Gửi avatar ban đầu
         }
 
         await axios.put(
           `${process.env.REACT_APP_API_URL}/api/auth/users/${selectedUser._id}`,
-          requestBody,
+          formPayload,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
             },
           }
         );
@@ -147,13 +154,8 @@ export function OverlayEditUser({
                 />
               </div>
               <label>
-                Url:
-                <input
-                  type="text"
-                  name="avatar"
-                  value={formData.avatar.url}
-                  onChange={handleInputChange}
-                />
+                Upload Avatar:
+                <input type="file" onChange={handleFileChange} />
               </label>
               <label>
                 Username

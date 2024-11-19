@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from "react";
+import { Fragment, useState } from "react";
 import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./Overlay.css";
@@ -18,12 +18,14 @@ export function OverlayAddUser({ isOpenAdd, onClose, refreshUsers }) {
     phone: "",
     address: "",
     password: "",
-    avatar:
-      "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg",
+    avatar: null,
     isOnline: false,
     user_role: "User",
   });
 
+  const [previewAvatar, setPreviewAvatar] = useState(
+    "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"
+  );
   const navigate = useNavigate();
   const [isAdd, setIsAdd] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,21 +34,24 @@ export function OverlayAddUser({ isOpenAdd, onClose, refreshUsers }) {
     const token = localStorage.getItem("sav-token");
     if (token) {
       try {
-        const requestBody = {
-          username: formData.username,
-          email: formData.email,
-          phone: formData.phone,
-          address: formData.address,
-          user_role: formData.user_role,
-          password: formData.password,
-          avatar: formData.avatar,
-        };
+        const formDataToSend = new FormData();
+        formDataToSend.append("username", formData.username);
+        formDataToSend.append("email", formData.email);
+        formDataToSend.append("phone", formData.phone);
+        formDataToSend.append("address", formData.address);
+        formDataToSend.append("user_role", formData.user_role);
+        formDataToSend.append("password", formData.password);
+        if (formData.avatar) {
+          formDataToSend.append("avatar", formData.avatar);
+        }
+
         await axios.post(
           `${process.env.REACT_APP_API_URL}/api/auth/admin/create-user`,
-          requestBody,
+          formDataToSend,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
             },
           }
         );
@@ -80,6 +85,18 @@ export function OverlayAddUser({ isOpenAdd, onClose, refreshUsers }) {
     setIsAdd(true);
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        avatar: file,
+      }));
+      setPreviewAvatar(URL.createObjectURL(file));
+      setIsAdd(true);
+    }
+  };
+
   return (
     <Fragment>
       {isOpenAdd && (
@@ -97,28 +114,23 @@ export function OverlayAddUser({ isOpenAdd, onClose, refreshUsers }) {
             <form className="overlay__form">
               <div className="avatar-container">
                 <img
-                  src={formData.avatar}
+                  src={previewAvatar}
                   alt="avatar user"
                   width="150px"
                   height="150px"
                   style={{ borderRadius: "50%", objectFit: "cover" }}
-                  onError={(e) => {
-                    e.target.src =
-                      "https://t4.ftcdn.net/jpg/05/49/98/39/360_F_549983970_bRCkYfk0P6PP5fKbMhZMIb07mCJ6esXL.jpg"; // Default avatar path
-                  }}
                 />
               </div>
               <label>
-                Url:
+                Upload Avatar:
                 <input
-                  type="text"
-                  name="avatar"
-                  value={formData.avatar}
-                  onChange={handleInputChange}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
                 />
               </label>
               <label>
-                Username
+                Username:
                 <input
                   type="text"
                   name="username"
