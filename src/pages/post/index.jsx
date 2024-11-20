@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
@@ -32,11 +41,18 @@ const Post = () => {
   const [isOpenActive, setIsOpenActive] = useState(false);
   const [isOpenComments, setIsOpenComments] = useState(false);
   const [isOpenCreateReport, setIsOpenCreateReport] = useState(false);
-  const [FilterRoomType, setFilterRoomType] = useState("");
-  const [FilterStatus, setFilterStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("All"); // Bộ lọc trạng thái
+  const [selectedRoomType, setSelectedRoomType] = useState("All"); // Bộ lọc trạng thái
   const [filteredPosts, setFilteredPosts] = useState([]); // Dữ liệu sau khi lọc
 
-  const statusPost = ["Active", "Inactive", "Deleted", "Pending", "Locked"];
+  const statusPost = [
+    "All",
+    "Active",
+    "Inactive",
+    "Deleted",
+    "Pending",
+    "Locked",
+  ];
   const statusPostColors = {
     Active: "#23ca02",
     Inactive: "#ec8a0e",
@@ -45,7 +61,14 @@ const Post = () => {
     Locked: "#ff0000",
   };
 
-  const roomTypePost = ["Single", "Shared", "Apartment", "Dormitory", "Double"];
+  const roomTypePost = [
+    "All",
+    "Single",
+    "Shared",
+    "Apartment",
+    "Dormitory",
+    "Double",
+  ];
   const roomTypePostColors = {
     Single: "#23ca02",
     Shared: "#ec8a0e",
@@ -119,6 +142,23 @@ const Post = () => {
   useEffect(() => {
     getPosts();
   }, [navigate]);
+
+  useEffect(() => {
+    if (selectedStatus === "All") {
+      setFilteredPosts(posts);
+    } else {
+      setFilteredPosts(posts.filter((post) => post.status === selectedStatus));
+    }
+  }, [selectedStatus, posts]);
+  useEffect(() => {
+    if (selectedRoomType === "All") {
+      setFilteredPosts(posts);
+    } else {
+      setFilteredPosts(
+        posts.filter((post) => post.roomType === selectedRoomType)
+      );
+    }
+  }, [selectedRoomType, posts]);
 
   const columns = [
     { field: "_id", headerName: "Post Id", width: 170 },
@@ -686,13 +726,46 @@ const Post = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="POST" subtitle="Welcome to posts" />
-        <IconButton
-          onClick={() => {
-            toggleOverlayAdd();
-          }}
-        >
-          <MdPostAdd size="30" />
-        </IconButton>
+        <Box display="flex" alignItems="center" gap="10px">
+          <Typography variant="body1" style={{ fontWeight: "bold" }}>
+            Filter by:
+          </Typography>
+          <FormControl>
+            <InputLabel>RoomType</InputLabel>
+            <Select
+              value={selectedRoomType}
+              onChange={(e) => setSelectedRoomType(e.target.value)}
+              style={{ minWidth: "150px" }}
+            >
+              {roomTypePost.map((roomType) => (
+                <MenuItem key={roomType} value={roomType}>
+                  {roomType}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              style={{ minWidth: "150px" }}
+            >
+              {statusPost.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <IconButton
+            onClick={() => {
+              toggleOverlayAdd();
+            }}
+          >
+            <MdPostAdd size="30" />
+          </IconButton>
+        </Box>
       </Box>
       <Box
         m="8px 0 0 0"
@@ -722,7 +795,7 @@ const Post = () => {
         }}
       >
         <DataGrid
-          rows={posts}
+          rows={filteredPosts}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row._id}
