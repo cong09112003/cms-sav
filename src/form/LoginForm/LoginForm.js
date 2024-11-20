@@ -129,7 +129,11 @@ function LoginForm() {
             />
             <FaLock className="icon" />
             {errors.password && <p className="error">{errors.password}</p>}
-            {loginError && <p className="error">{loginError}</p>}
+            {loginError && (
+              <p className="error" style={{ marginTop: "20px" }}>
+                {loginError}
+              </p>
+            )}
           </div>
           <div className="remember-forgot">
             <label>
